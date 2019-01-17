@@ -48,6 +48,7 @@ AGCCharacter::AGCCharacter()
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	FollowCamera->bUsePawnControlRotation = false;
+	FollowCamera->bAutoActivate = false;
 }
 
 //////////////////////////////////////////////////////////////////////////
