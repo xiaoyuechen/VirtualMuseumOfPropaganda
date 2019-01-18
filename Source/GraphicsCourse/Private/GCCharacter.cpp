@@ -68,7 +68,18 @@ void AGCCharacter::SetupPlayerInputComponent(class UInputComponent* InputCompone
 	InputComponent->BindAxis("MoveRight", this, &AGCCharacter::MoveRight);
 	InputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	InputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
-	
+	InputComponent->BindAction("Browse", IE_Released, this, &ACharacter::StartBrowse);
+}
+
+void AGCCharacter::StartBrowse()
+{
+
+}
+
+void AGCCharacter::FindComponents(UCameraComponent* FPCameraToSet)
+{
+	FPCamera = FPCameraToSet;
+
 }
 
 
