@@ -7,6 +7,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Camera/CameraComponent.h"
+#include "DrawDebugHelpers.h"
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -68,11 +69,44 @@ void AGCCharacter::SetupPlayerInputComponent(class UInputComponent* InputCompone
 	InputComponent->BindAxis("MoveRight", this, &AGCCharacter::MoveRight);
 	InputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	InputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
-	InputComponent->BindAction("Browse", IE_Released, this, &ACharacter::StartBrowse);
+	InputComponent->BindAction("Browse", IE_Released, this, &AGCCharacter::StartBrowsing);
 }
 
-void AGCCharacter::StartBrowse()
+void AGCCharacter::StartBrowsing()
 {
+	if (!FPCamera || !FPCamera->IsActive()) { return; }
+	UE_LOG(LogTemp, Warning, TEXT("StartBrowsing!"));
+	FVector CameraWorldLocation;
+	FVector LookDirection;
+	if (GetLookDirection(CameraWorldLocation, LookDirection))
+	{
+		FHitResult HitResult;
+		const FVector StartLocation = CameraWorldLocation;
+		const FVector EndLocation = StartLocation + LookDirection * SphereSweepRange;
+		if (GetWorld()->
+			SweepSingleByChannel(
+			HitResult,
+			StartLocation,
+			EndLocation,
+			FQuat::Identity,
+			ECollisionChannel::ECC_Visibility,
+			FCollisionShape::MakeSphere(SphereSweepRadius),
+			FCollisionQueryParams::DefaultQueryParam,
+			FCollisionResponseParams::DefaultResponseParam)
+			)
+		{
+			FString ObjectName = HitResult.GetActor()->GetName();
+			UE_LOG(LogTemp, Warning, TEXT("Sweep Name: %s"), *ObjectName);
+			DrawDebugSphere(
+				GetWorld(),
+				EndLocation,
+				SphereSweepRadius,
+				32,
+				FColor(255, 0, 255),
+				true
+			);
+		}
+	}
 
 }
 
@@ -80,6 +114,21 @@ void AGCCharacter::FindComponents(UCameraComponent* FPCameraToSet)
 {
 	FPCamera = FPCameraToSet;
 
+}
+
+bool AGCCharacter::GetLookDirection(FVector &CameraWorldLocation, FVector &LookDirection) const
+{
+	// Find the crosshair position in pixel coordinates
+	int32 ViewportSizeX, ViewportSizeY;
+	GetWorld()->GetFirstPlayerController()->GetViewportSize(ViewportSizeX, ViewportSizeY);
+	auto ScreenLocation = FVector2D(ViewportSizeX /2, ViewportSizeY /2);
+	// "De-project" the screen position of the crosshair to a world direction
+	return  GetWorld()->GetFirstPlayerController()->DeprojectScreenPositionToWorld(
+		ScreenLocation.X,
+		ScreenLocation.Y,
+		CameraWorldLocation,
+		LookDirection
+	);
 }
 
 

@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "GCCharacter.generated.h"
 
+
 /**
 * This class is the character class for Immortal, and it is responsible for all physical interaction between the player and the world
 * It also handles the damage the character takes in
@@ -46,10 +47,12 @@ public:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
 
-	void StartBrowse();
+	void StartBrowsing();
 
-	UFUNCTION(BlueprintCallable)
-		void FindComponents(UCameraComponent* FPCameraToSet);
+	UFUNCTION(BlueprintCallable, Category = Initialization)
+	void FindComponents(class UCameraComponent* FPCameraToSet);
+
+	bool GetLookDirection(FVector &CameraWorldLocation, FVector &LookDirection) const;
 
 protected:
 	/** Camera boom positioning the camera behind the character */
@@ -60,7 +63,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 		class UCameraComponent* FollowCamera;
 
-	class UCameraCoponent* FPCamera;
+	class UCameraComponent* FPCamera;
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
@@ -70,5 +73,10 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 		float BaseLookUpRate;
 
+	UPROPERTY(EditAnywhere, Category = "CharacterSetup")
+		float SphereSweepRange = 500.f;
+
+	UPROPERTY(EditAnywhere, Category = "CharacterSetup")
+		float SphereSweepRadius = 100.f;
 
 };
