@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "GCCharacter.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGCCharacterDelegate, AActor*, HitActor);
 
 /**
 * This class is the character class for Immortal, and it is responsible for all physical interaction between the player and the world
@@ -53,6 +54,8 @@ public:
 	void FindComponents(class UCameraComponent* FPCameraToSet);
 
 	bool GetLookDirection(FVector &CameraWorldLocation, FVector &LookDirection) const;
+
+	FGCCharacterDelegate OnBrowse;
 
 protected:
 	/** Camera boom positioning the camera behind the character */

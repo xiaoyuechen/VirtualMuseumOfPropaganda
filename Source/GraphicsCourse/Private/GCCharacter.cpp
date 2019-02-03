@@ -69,7 +69,7 @@ void AGCCharacter::SetupPlayerInputComponent(class UInputComponent* InputCompone
 	InputComponent->BindAxis("MoveRight", this, &AGCCharacter::MoveRight);
 	InputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	InputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
-	InputComponent->BindAction("Browse", IE_Released, this, &AGCCharacter::StartBrowsing);
+	InputComponent->BindAction("Browse", IE_Pressed, this, &AGCCharacter::StartBrowsing);
 }
 
 void AGCCharacter::StartBrowsing()
@@ -105,6 +105,8 @@ void AGCCharacter::StartBrowsing()
 				FColor(255, 0, 255),
 				true
 			);
+
+			OnBrowse.Broadcast(HitResult.GetActor());
 		}
 	}
 
