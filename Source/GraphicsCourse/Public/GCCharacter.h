@@ -50,6 +50,9 @@ public:
 
 	void StartBrowsing();
 
+	UFUNCTION(BlueprintCallable, Category = "Browsing")
+	bool IsSweepActorBrowseable(FHitResult &HitResult);
+
 	UFUNCTION(BlueprintCallable, Category = Initialization)
 	void FindComponents(class UCameraComponent* FPCameraToSet);
 

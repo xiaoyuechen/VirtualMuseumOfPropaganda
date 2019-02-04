@@ -25,10 +25,16 @@ public:
 	void StopBrowsing();
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "CamPawn")
-	void OnCamPawnSpawned(APawn* CamPawn, AActor* HitActor);
+	void OnOrbitCamPawnSpawned(APawn* CamPawn, AActor* HitActor);
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "CamPawn")
+	void OnPanCamPawnSpawned(APawn* CamPawn, AActor* HitActor);
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Setup")
-	TSubclassOf<APawn> CamPawnBlueprint;
+	TSubclassOf<APawn> OrbitCamPawnBlueprint;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Setup")
+	TSubclassOf<APawn> PanCamPawnBlueprint;
 
 private:
 	

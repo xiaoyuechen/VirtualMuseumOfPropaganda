@@ -23,14 +23,25 @@ void AGCPlayerController::SetupInputComponent()
 
 void AGCPlayerController::SwapToCamPawn(AActor* HitActor)
 {
-	FVector SpawnLocation = HitActor->GetActorLocation();
+	bool bUseOrbitCam;
+	if (HitActor->ActorHasTag("3D")) { bUseOrbitCam = true; }
+	else if (HitActor->ActorHasTag("2D")) { bUseOrbitCam = false; }
+	else { return; }
+	USceneComponent* Centre = Cast<USceneComponent>(HitActor->GetComponentsByTag(USceneComponent::StaticClass(), "Centre")[0]);
+	if (!Centre) { return; }
+	FVector SpawnLocation = Centre->GetComponentLocation();
 	FRotator SpawnRotation = PlayerCameraManager->GetCameraRotation();
+	APawn* CamPawn = nullptr;
+	if (bUseOrbitCam) { CamPawn = GetWorld()->SpawnActor<APawn>(OrbitCamPawnBlueprint, SpawnLocation, SpawnRotation); }
+	else { CamPawn = GetWorld()->SpawnActor<APawn>(PanCamPawnBlueprint, SpawnLocation, SpawnRotation); }
+	if (!CamPawn) { return; }
+	GCCharacter->SetActorHiddenInGame(true);
 	UnPossess();
-	APawn* CamPawn = GetWorld()->SpawnActor<APawn>(CamPawnBlueprint,SpawnLocation, SpawnRotation);
 	Possess(CamPawn);
 	bIsBrowsing = true;
 
-	OnCamPawnSpawned(CamPawn, HitActor);
+	if (bUseOrbitCam) { OnOrbitCamPawnSpawned(CamPawn, HitActor); }
+	else { OnPanCamPawnSpawned(CamPawn, HitActor); }
 }
 
 void AGCPlayerController::StopBrowsing()
@@ -39,6 +50,7 @@ void AGCPlayerController::StopBrowsing()
 	APawn* CamPawn = GetPawn();
 	UnPossess();
 	Possess(GCCharacter);
+	GCCharacter->SetActorHiddenInGame(false);
 	CamPawn->Destroy();
 	bIsBrowsing = false;
 }

@@ -74,17 +74,34 @@ void AGCCharacter::SetupPlayerInputComponent(class UInputComponent* InputCompone
 
 void AGCCharacter::StartBrowsing()
 {
-	if (!FPCamera || !FPCamera->IsActive()) { return; }
-	UE_LOG(LogTemp, Warning, TEXT("StartBrowsing!"));
+	FHitResult HitResult;
+	if (IsSweepActorBrowseable(HitResult))
+	{
+		OnBrowse.Broadcast(HitResult.GetActor());
+	}
+}
+
+bool AGCCharacter::IsSweepActorBrowseable(FHitResult &HitResult)
+{
+	HitResult = FHitResult();
+	if (!FPCamera || !FPCamera->IsActive()) { return false; }
 	FVector CameraWorldLocation;
 	FVector LookDirection;
-	if (GetLookDirection(CameraWorldLocation, LookDirection))
-	{
-		FHitResult HitResult;
-		const FVector StartLocation = CameraWorldLocation;
-		const FVector EndLocation = StartLocation + LookDirection * SphereSweepRange;
-		if (GetWorld()->
-			SweepSingleByChannel(
+	if (!GetLookDirection(CameraWorldLocation, LookDirection)) { return false; }
+	//FString ObjectName = HitResult.GetActor()->GetName();
+	//UE_LOG(LogTemp, Warning, TEXT("Sweep Name: %s"), *ObjectName);
+	//DrawDebugSphere(
+	//	GetWorld(),
+	//	EndLocation,
+	//	SphereSweepRadius,
+	//	32,
+	//	FColor(255, 0, 255),
+	//	true
+	//);
+	const FVector StartLocation = CameraWorldLocation;
+	const FVector EndLocation = StartLocation + LookDirection * SphereSweepRange;
+	if (!GetWorld()->
+		SweepSingleByChannel(
 			HitResult,
 			StartLocation,
 			EndLocation,
@@ -93,23 +110,14 @@ void AGCCharacter::StartBrowsing()
 			FCollisionShape::MakeSphere(SphereSweepRadius),
 			FCollisionQueryParams::DefaultQueryParam,
 			FCollisionResponseParams::DefaultResponseParam)
-			)
-		{
-			FString ObjectName = HitResult.GetActor()->GetName();
-			UE_LOG(LogTemp, Warning, TEXT("Sweep Name: %s"), *ObjectName);
-			DrawDebugSphere(
-				GetWorld(),
-				EndLocation,
-				SphereSweepRadius,
-				32,
-				FColor(255, 0, 255),
-				true
-			);
-
-			OnBrowse.Broadcast(HitResult.GetActor());
-		}
+		)
+	{
+		return false;
 	}
 
+	if (!(HitResult.Actor->ActorHasTag("2D") || HitResult.Actor->ActorHasTag("3D"))) { return false; }
+
+	return true;
 }
 
 void AGCCharacter::FindComponents(UCameraComponent* FPCameraToSet)
