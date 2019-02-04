@@ -84,6 +84,7 @@ void AGCCharacter::StartBrowsing()
 bool AGCCharacter::IsSweepActorBrowseable(FHitResult &HitResult)
 {
 	HitResult = FHitResult();
+	if (!Controller) { return false; }
 	if (!FPCamera || !FPCamera->IsActive()) { return false; }
 	FVector CameraWorldLocation;
 	FVector LookDirection;
