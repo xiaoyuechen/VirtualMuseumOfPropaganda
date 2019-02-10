@@ -24,6 +24,8 @@ public:
 
 	void StopBrowsing();
 
+	void TryQuitGame();
+
 	UFUNCTION(BlueprintImplementableEvent, Category = "CamPawn")
 	void OnOrbitCamPawnSpawned(APawn* CamPawn, AActor* HitActor);
 

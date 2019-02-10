@@ -19,6 +19,7 @@ void AGCPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 	InputComponent->BindAction("Cancel", IE_Pressed, this, &AGCPlayerController::StopBrowsing);
+	InputComponent->BindAction("Quit", IE_Pressed, this, &AGCPlayerController::TryQuitGame);
 }
 
 void AGCPlayerController::SwapToCamPawn(AActor* HitActor)
@@ -46,11 +47,20 @@ void AGCPlayerController::SwapToCamPawn(AActor* HitActor)
 
 void AGCPlayerController::StopBrowsing()
 {
-	if (!bIsBrowsing) { return; }
+	if (!bIsBrowsing) 
+	{
+		return; 
+	}
 	APawn* CamPawn = GetPawn();
 	UnPossess();
 	Possess(GCCharacter);
 	GCCharacter->SetActorHiddenInGame(false);
 	CamPawn->Destroy();
 	bIsBrowsing = false;
+}
+
+void AGCPlayerController::TryQuitGame()
+{
+	if (bIsBrowsing) { StopBrowsing(); }
+	else { ConsoleCommand("quit"); }
 }
